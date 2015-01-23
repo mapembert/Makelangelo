@@ -274,10 +274,25 @@ static void setPenAngle(int pen_angle) {
   }
 }
 
-
 //------------------------------------------------------------------------------
 // Inverse Kinematics - turns XY coordinates into lengths L1,L2
 static void IK(float x, float y, long &l1, long &l2) {
+  l1 = floor((x+y) / THREADPERSTEP1);
+  l2 = floor((x-y) / THREADPERSTEP2);
+}
+
+//------------------------------------------------------------------------------
+// Forward Kinematics - turns L1,L2 lengths into XY coordinates
+static void FK(float l1, float l2,float &x,float &y) {
+  l1 *= THREADPERSTEP1;
+  l2 *= THREADPERSTEP2;
+  x = (float)( l1 + l2 ) / 2.0;
+  y = x - (float)l2;
+}
+
+//------------------------------------------------------------------------------
+// Inverse Kinematics - turns XY coordinates into lengths L1,L2
+static void IK_old(float x, float y, long &l1, long &l2) {
   // find length to M1
   float dy = y - limit_top;
   float dx = x - limit_left;
@@ -292,7 +307,7 @@ static void IK(float x, float y, long &l1, long &l2) {
 // Forward Kinematics - turns L1,L2 lengths into XY coordinates
 // use law of cosines: theta = acos((a*a+b*b-c*c)/(2*a*b));
 // to find angle between M1M2 and M1P where P is the plotter position.
-static void FK(float l1, float l2,float &x,float &y) {
+static void FK_old(float l1, float l2,float &x,float &y) {
   float a = l1 * THREADPERSTEP1;
   float b = (limit_right-limit_left);
   float c = l2 * THREADPERSTEP2;
